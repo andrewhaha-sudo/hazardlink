@@ -1,7 +1,7 @@
 "use client";
 /**
  * HAZARDLINK — Preparedness Drills
- * Simulation mode for earthquake, flood, fire, typhoon drills (no real alerts sent).
+ * Drill mode for earthquake, flood, fire, typhoon drills (no real alerts sent).
  */
 import { useEffect, useState } from 'react';
 import { api } from '../../lib/api';
@@ -41,7 +41,7 @@ export default function DrillsPage() {
         <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
           <GraduationCap className="text-indigo-600" /> Preparedness Drills
         </h1>
-        <p className="text-slate-600">Simulation mode for earthquake, flood, fire, and typhoon drills. No real emergency notifications are sent.</p>
+        <p className="text-slate-600">Drill mode for earthquake, flood, fire, and typhoon drills. No real emergency notifications are sent.</p>
       </div>
         <div className="card">
         <h3 className="text-sm font-semibold text-slate-900 mb-4">Available Drill Scenarios</h3>
@@ -53,7 +53,7 @@ export default function DrillsPage() {
               <div key={t.value} className="p-4 rounded border bg-slate-50/50 flex items-center justify-between">
                 <div>
                   <div className="font-medium text-slate-900">{t.label}</div>
-                  <div className="text-xs text-slate-500">Simulate alerts, blocked routes, and evacuation scenarios.</div>
+                  <div className="text-xs text-slate-500">Generate alerts, blocked routes, and evacuation scenarios.</div>
                 </div>
                 <div className="flex gap-2">
                   {!isActive ? (
@@ -100,7 +100,7 @@ export default function DrillsPage() {
       </div>
 
       <div className="text-xs text-slate-400">
-        <Shield size={14} className="mr-1" /> Drill mode simulates alerts and scenarios without sending real emergency notifications or contacting actual emergency responders.
+        <Shield size={14} className="mr-1" /> Drill mode generates alerts and scenarios without sending real emergency notifications or contacting actual emergency responders.
       </div>
     </div>
   );
