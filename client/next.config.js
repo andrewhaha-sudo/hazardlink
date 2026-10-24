@@ -1,8 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  distDir: '../.next',
-  distDir: '../.next',
   images: {
     domains: [],
     remotePatterns: [],
