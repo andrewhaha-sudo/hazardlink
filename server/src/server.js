@@ -40,11 +40,7 @@ const db = {
 // We'll require sample data via a generated JS file to avoid TS in server
 let sample = {};
 try {
-  const path = require('path');
-  const samplePath = path.resolve(__dirname, '../../shared/sampleData.js');
-  if (require('fs').existsSync(samplePath)) {
-    sample = require(samplePath);
-  }
+  sample = require('../../shared/sampleData.js');
 } catch (e) {
   console.warn('Sample data JS not found, using empty defaults:', e.message);
 }
