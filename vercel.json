@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run build:client && cp -r client/.next .next",
+  "buildCommand": "npm install && npm run build && cp -r .next ../.next",
   "installCommand": "",
   "outputDirectory": ".next",
   "framework": null,
