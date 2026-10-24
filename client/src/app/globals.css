@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --hazard-low: #22c55e;
+  --hazard-moderate: #eab308;
+  --hazard-high: #f97316;
+  --hazard-critical: #dc2626;
+}
+
+body {
+  @apply bg-slate-50 text-slate-900 antialiased;
+}
+
+
+.source-badge {
+  @apply inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium border;
+}
+.source-badge.official { @apply bg-green-50 text-green-800 border-green-100; }
+.source-badge.community { @apply bg-blue-50 text-blue-800 border-blue-100; }
+.source-badge.estimate { @apply bg-amber-50 text-amber-800 border-amber-100; }
+
+.severity-badge {
+  @apply inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold border;
+}
+.severity-low { @apply bg-green-50 text-green-800 border-green-100; }
+.severity-moderate { @apply bg-amber-50 text-amber-800 border-amber-100; }
+.severity-high { @apply bg-orange-50 text-orange-800 border-orange-100; }
+.severity-critical { @apply bg-red-50 text-red-800 border-red-100; }
+
+.map-container {
+  height: 100%;
+  width: 100%;
+  position: relative;
+}
+
+.leaflet-popup-content-wrapper {
+  @apply p-0 text-sm;
+}
+
+.btn-sos {
+  @apply bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-lg transition-all active:scale-95 flex items-center gap-2;
+}
+
+.btn-primary {
+  @apply bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors;
+}
+
+.btn-ghost {
+  @apply bg-white hover:bg-slate-100 text-slate-700 text-sm font-medium px-4 py-2 rounded-lg border border-slate-200 transition-colors;
+}
+
+.card {
+  @apply bg-white rounded-xl shadow-sm border border-slate-200 p-5;
+}
+
+.sr-only-text {
+  @apply sr-only;
+}
