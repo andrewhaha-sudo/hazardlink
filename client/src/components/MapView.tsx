@@ -42,6 +42,8 @@ export default function MapView() {
   const [search, setSearch] = useState('');
   const [layers, setLayers] = useState({ buildings: true, rooms: true, hazards: true, routes: true, assembly: true, people: true });
   const [freshness, setFreshness] = useState(new Date().toISOString());
+  const [mapType, setMapType] = useState<'roadmap' | 'satellite' | 'hybrid' | 'terrain'>('hybrid');
+  const [showLabels, setShowLabels] = useState(true);
 
   const CENTER: [number, number] = [14.6394, 121.0462];
 
@@ -137,81 +139,204 @@ export default function MapView() {
     );
   }
 
+  const getTileLayerUrl = () => {
+    switch (mapType) {
+      case 'satellite':
+        return 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+      case 'hybrid':
+        return 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+      case 'terrain':
+        return 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png';
+      case 'roadmap':
+      default:
+        return 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+    }
+  };
+
+  const getLabelsLayerUrl = () => {
+    if (mapType === 'hybrid' && showLabels) {
+      return 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png';
+    }
+    return null;
+  };
+
   return (
     <div className="flex flex-col h-[70vh] md:h-[85vh] gap-3">
       <ModeBar mode={mode} setMode={setMode} resetView={resetView} />
       {/* Search + layers */}
       <div className="flex flex-col md:flex-row gap-2">
         <div className="relative flex-1">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search buildings, rooms, hazards..."
-            className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-slate-900 outline-none"
+            placeholder="Search San Rafael High School campus..."
+            className="w-full pl-10 pr-4 py-3 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none shadow-lg font-medium transition-all"
+            style={{ background: 'var(--card-bg)', border: '1px solid rgba(255, 255, 255, 0.3)' }}
           />
         </div>
-        <div className="flex gap-1 flex-wrap">
-          {Object.keys(layers).map(k => (
-            <button
-              key={k}
-              onClick={() => setLayers(prev => ({ ...prev, [k]: !prev[k as keyof typeof layers] }))}
-              className={`px-2 py-1.5 text-xs rounded-lg border ${layers[k as keyof typeof layers] ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-600 border-slate-200'}`}
-            >
-              {k}
-            </button>
-          ))}
+        <div className="flex gap-2 items-center">
+          <select
+            value={mapType}
+            onChange={(e) => setMapType(e.target.value as any)}
+            className="px-3 py-2 text-xs font-bold rounded-xl shadow-lg border-none outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+            style={{ background: 'var(--card-bg)' }}
+          >
+            <option value="roadmap">Map</option>
+            <option value="satellite">Satellite</option>
+            <option value="hybrid">Hybrid</option>
+            <option value="terrain">Terrain</option>
+          </select>
+          <div className="flex gap-1 flex-wrap">
+            {Object.keys(layers).map(k => (
+              <button
+                key={k}
+                onClick={() => setLayers(prev => ({ ...prev, [k]: !prev[k as keyof typeof layers] }))}
+                className={`px-2.5 py-2 text-xs font-bold rounded-xl shadow-md transition-all ${layers[k as keyof typeof layers] ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white' : 'text-slate-700'}`}
+                style={!layers[k as keyof typeof layers] ? { background: 'var(--card-bg)' } : {}}
+              >
+                {k}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
       <div className="flex-1 flex gap-3 min-h-0">
         {/* Map */}
-        <div className="flex-1 min-h-[400px] border border-slate-200 rounded-xl overflow-hidden relative">
-          {loading && <div className="absolute inset-0 z-[1000] bg-white/70 flex items-center justify-center text-slate-500 text-sm">Loading map...</div>}
-          <MapContainer center={CENTER} zoom={17} style={{ height: '100%', width: '100%' }}>
+        <div className="flex-1 min-h-[400px] rounded-2xl overflow-hidden relative shadow-2xl" style={{ border: '2px solid rgba(255, 255, 255, 0.4)' }}>
+          {loading && (
+            <div className="absolute inset-0 z-[1000] flex items-center justify-center" style={{ background: 'var(--glass-bg)' }}>
+              <div className="text-center">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center mx-auto mb-3">
+                  <MapPin className="text-blue-600 animate-bounce" size={32} />
+                </div>
+                <div className="text-sm font-bold text-slate-900">Loading map...</div>
+              </div>
+            </div>
+          )}
+          <MapContainer center={CENTER} zoom={18} style={{ height: '100%', width: '100%' }} zoomControl={false}>
             <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
+              url={getTileLayerUrl()}
+              attribution='Esri, DigitalGlobe, GeoEye, Earthstar Geographics, CNES/Airbus DS, USDA, USGS, AeroGRID, IGN, and the GIS User Community'
+              maxZoom={19}
             />
-            {userLocation && layers.people && (
-              <Marker position={[userLocation.lat, userLocation.lng]} icon={userIcon}>
-                <Popup>
-                  <div className="text-sm font-medium">Your Location (GPS)</div>
-                  <div className="text-xs text-slate-500">Approximate • tap for precision</div>
-                </Popup>
-              </Marker>
+            {getLabelsLayerUrl() && (
+              <TileLayer
+                url={getLabelsLayerUrl()!}
+                attribution='&copy; CARTO'
+                maxZoom={19}
+                zIndex={1000}
+              />
             )}
-            {/* Buildings */}
+            {userLocation && layers.people && (() => {
+              const myLocationIcon = L.divIcon({
+                className: 'my-location-marker',
+                html: `
+                  <div style="position: relative;">
+                    <div style="
+                      width: 48px;
+                      height: 48px;
+                      background: rgba(66, 133, 244, 0.2);
+                      border-radius: 50%;
+                      position: absolute;
+                      top: -24px;
+                      left: -24px;
+                      animation: pulse-blue 2s infinite;
+                    "></div>
+                    <div style="
+                      width: 16px;
+                      height: 16px;
+                      background: #4285f4;
+                      border: 3px solid white;
+                      border-radius: 50%;
+                      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+                      position: absolute;
+                      top: -8px;
+                      left: -8px;
+                    "></div>
+                  </div>
+                  <style>
+                    @keyframes pulse-blue {
+                      0%, 100% { transform: scale(1); opacity: 0.3; }
+                      50% { transform: scale(1.2); opacity: 0.1; }
+                    }
+                  </style>
+                `,
+                iconSize: [16, 16],
+                iconAnchor: [8, 8],
+              });
+              return (
+                <Marker position={[userLocation.lat, userLocation.lng]} icon={myLocationIcon}>
+                  <Popup className="google-maps-popup">
+                    <div className="p-2">
+                      <div className="text-base font-bold text-blue-600 mb-1">Your Location</div>
+                      <div className="text-xs text-slate-600">GPS · Live tracking</div>
+                      <div className="text-xs text-slate-500 mt-1">
+                        {userLocation.lat.toFixed(6)}, {userLocation.lng.toFixed(6)}
+                      </div>
+                    </div>
+                  </Popup>
+                </Marker>
+              );
+            })()}
+            {/* Buildings - Google Maps style */}
             {layers.buildings && buildingsForView.map(b => (
               <Polygon
                 key={b.id}
                 positions={b.polygon}
-                pathOptions={{ color: b.color, fillColor: b.color, fillOpacity: selectedBuilding?.id === b.id ? 0.45 : 0.2, weight: 2 }}
+                pathOptions={{
+                  color: selectedBuilding?.id === b.id ? '#1a73e8' : '#ffffff',
+                  fillColor: selectedBuilding?.id === b.id ? '#4285f4' : b.color,
+                  fillOpacity: selectedBuilding?.id === b.id ? 0.5 : 0.35,
+                  weight: selectedBuilding?.id === b.id ? 3 : 2,
+                  opacity: 0.9
+                }}
                 eventHandlers={{ click: () => openBuilding(b) }}
               >
-                <Popup>
-                  <div className="text-sm font-semibold">{b.name}</div>
-                  <div className="text-xs text-slate-500">Floors: {b.floors.join(', ')}</div>
-                  <button className="mt-1 text-xs text-blue-600 underline" onClick={() => openBuilding(b)}>Open floors</button>
+                <Popup className="google-maps-popup">
+                  <div className="p-2">
+                    <div className="text-base font-bold text-slate-900 mb-1">{b.name}</div>
+                    <div className="text-xs text-slate-600 mb-2">Building · {b.floors.length} floors</div>
+                    <button
+                      className="text-xs text-blue-600 font-semibold hover:underline"
+                      onClick={() => openBuilding(b)}
+                    >
+                      View floor plan →
+                    </button>
+                  </div>
                 </Popup>
               </Polygon>
             ))}
-            {/* Rooms */}
+            {/* Rooms - Google Maps pins style */}
             {layers.rooms && roomsForView.map(r => (
               <Circle
                 key={r.id}
                 center={r.center as [number, number]}
-                radius={6}
-                pathOptions={{ color: scanStatusColor[r.scanStatus], fillColor: scanStatusColor[r.scanStatus], fillOpacity: 0.9, weight: 1 }}
+                radius={8}
+                pathOptions={{
+                  color: '#ffffff',
+                  fillColor: scanStatusColor[r.scanStatus],
+                  fillOpacity: 0.95,
+                  weight: 2,
+                  opacity: 1
+                }}
                 eventHandlers={{ click: () => setSelectedRoom(r) }}
               >
-                <Popup>
-                  <div className="text-sm font-semibold">{r.name}</div>
-                  <div className="text-xs text-slate-500">{r.type} · Floor {r.floor}</div>
+                <Popup className="google-maps-popup">
+                  <div className="p-2">
+                    <div className="text-base font-bold text-slate-900">{r.name}</div>
+                    <div className="text-xs text-slate-600">{r.type} · Floor {r.floor}</div>
+                    <div className="mt-1 text-xs">
+                      <span className="inline-block px-2 py-0.5 rounded-full text-white font-semibold" style={{ background: scanStatusColor[r.scanStatus] }}>
+                        {r.scanStatus.replace('_', ' ')}
+                      </span>
+                    </div>
+                  </div>
                 </Popup>
               </Circle>
             ))}
-            {/* Hazard zones */}
+            {/* Hazard zones - Google Maps style with gradient */}
             {layers.hazards && zones.map((z) => {
               const color = hazardIconColors[z.type] || '#64748b';
               const coords = z.geometry?.type === 'Point' ? z.geometry.coordinates as [number, number] : CENTER;
@@ -219,48 +344,151 @@ export default function MapView() {
                 <Circle
                   key={z.id}
                   center={[coords[1], coords[0]] as [number, number]}
-                  radius={z.severity === 'critical' ? 60 : z.severity === 'high' ? 45 : 30}
-                  color={color}
-                  fillColor={color}
-                  fillOpacity={0.18}
+                  radius={z.severity === 'critical' ? 70 : z.severity === 'high' ? 50 : 35}
+                  pathOptions={{
+                    color: color,
+                    fillColor: color,
+                    fillOpacity: z.severity === 'critical' ? 0.35 : z.severity === 'high' ? 0.25 : 0.15,
+                    weight: 2,
+                    opacity: 0.8,
+                    dashArray: z.severity === 'critical' ? undefined : '5, 10'
+                  }}
                 >
-                  <Popup>
-                    <div className="text-sm font-medium">{z.name}</div>
-                    <div className="text-xs text-slate-500">{z.type} · {z.severity}</div>
-                    <div className="text-xs text-slate-500">{z.description}</div>
-                    <SourceBadge source={z.source} />
+                  <Popup className="google-maps-popup">
+                    <div className="p-3">
+                      <div className="flex items-center gap-2 mb-2">
+                        <AlertTriangle size={20} style={{ color }} />
+                        <div className="text-base font-bold text-slate-900">{z.name}</div>
+                      </div>
+                      <div className="space-y-1 text-xs text-slate-600">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold">Type:</span> {z.type}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <SeverityBadge severity={z.severity} />
+                        </div>
+                        <p className="text-slate-700 mt-2">{z.description}</p>
+                      </div>
+                      <div className="mt-2 pt-2 border-t border-slate-200">
+                        <SourceBadge source={z.source} />
+                      </div>
+                    </div>
                   </Popup>
                 </Circle>
               );
             })}
-            {/* Assembly points */}
-            {layers.assembly && ASSEMBLY_POINTS.map(ap => (
-              <Marker key={ap.id} position={ap.center as [number, number]}>
-                <Popup>
-                  <div className="text-sm font-semibold">{ap.name}</div>
-                  <div className="text-xs text-slate-500">Assembly point · capacity {ap.capacity}</div>
-                </Popup>
-              </Marker>
-            ))}
-            {/* Evac routes */}
+            {/* Assembly points - Google Maps style markers */}
+            {layers.assembly && ASSEMBLY_POINTS.map(ap => {
+              const assemblyIcon = L.divIcon({
+                className: 'custom-assembly-marker',
+                html: `
+                  <div style="position: relative;">
+                    <div style="
+                      width: 32px;
+                      height: 32px;
+                      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                      border-radius: 50% 50% 50% 0;
+                      transform: rotate(-45deg);
+                      border: 3px solid white;
+                      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                    "></div>
+                    <div style="
+                      position: absolute;
+                      top: 6px;
+                      left: 6px;
+                      width: 14px;
+                      height: 14px;
+                      background: white;
+                      border-radius: 50%;
+                    "></div>
+                  </div>
+                `,
+                iconSize: [32, 32],
+                iconAnchor: [16, 32],
+              });
+              return (
+                <Marker key={ap.id} position={ap.center as [number, number]} icon={assemblyIcon}>
+                  <Popup className="google-maps-popup">
+                    <div className="p-3">
+                      <div className="text-base font-bold text-slate-900 mb-2">{ap.name}</div>
+                      <div className="space-y-1 text-xs">
+                        <div className="flex items-center gap-2 text-green-700 font-semibold">
+                          <Shield size={14} />
+                          <span>Safe Assembly Point</span>
+                        </div>
+                        <div className="text-slate-600">Capacity: <span className="font-semibold">{ap.capacity} people</span></div>
+                      </div>
+                    </div>
+                  </Popup>
+                </Marker>
+              );
+            })}
+            {/* Evac routes - Google Maps directions style */}
             {layers.routes && EVAC_ROUTES.map(route => (
-              <Polygon key={route.id} positions={route.path as [number, number][]} pathOptions={{ color: '#10b981', weight: 3, fillOpacity: 0 }} />
+              <Polygon
+                key={route.id}
+                positions={route.path as [number, number][]}
+                pathOptions={{
+                  color: '#1a73e8',
+                  weight: 5,
+                  fillOpacity: 0,
+                  opacity: 0.9,
+                  dashArray: '10, 5',
+                  lineCap: 'round',
+                  lineJoin: 'round'
+                }}
+              />
             ))}
-            {/* Location shares */}
-            {layers.people && locationShares.filter(l => l.isActive).map(ls => (
-              <Marker key={ls.id} position={[ls.lat, ls.lng]} icon={userIcon}>
-                <Popup>
-                  <div className="text-sm font-medium">{ls.userName}</div>
-                  <div className="text-xs text-slate-500">{ls.userRole} · {ls.sharingMode}</div>
-                  <div className="text-xs text-slate-400">Last seen: {new Date(ls.lastUpdate).toLocaleTimeString()}</div>
-                </Popup>
-              </Marker>
-            ))}
+            {/* Location shares - Google Maps user markers */}
+            {layers.people && locationShares.filter(l => l.isActive).map(ls => {
+              const personIcon = L.divIcon({
+                className: 'person-marker',
+                html: `
+                  <div style="
+                    width: 32px;
+                    height: 32px;
+                    background: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%);
+                    border: 3px solid white;
+                    border-radius: 50%;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: bold;
+                    color: white;
+                    font-size: 14px;
+                  ">
+                    ${ls.userName.charAt(0).toUpperCase()}
+                  </div>
+                `,
+                iconSize: [32, 32],
+                iconAnchor: [16, 16],
+              });
+              return (
+                <Marker key={ls.id} position={[ls.lat, ls.lng]} icon={personIcon}>
+                  <Popup className="google-maps-popup">
+                    <div className="p-3">
+                      <div className="text-base font-bold text-slate-900 mb-1">{ls.userName}</div>
+                      <div className="space-y-1 text-xs">
+                        <div className="text-slate-600">{ls.userRole}</div>
+                        <div className="flex items-center gap-1">
+                          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                          <span className="text-green-600 font-semibold">{ls.sharingMode}</span>
+                        </div>
+                        <div className="text-slate-500 mt-2">
+                          Last update: {new Date(ls.lastUpdate).toLocaleTimeString()}
+                        </div>
+                      </div>
+                    </div>
+                  </Popup>
+                </Marker>
+              );
+            })}
           </MapContainer>
         </div>
 
-        {/* Side panel */}
-        <div className="w-full md:w-80 shrink-0 border border-slate-200 rounded-xl bg-white overflow-auto p-3 space-y-3">
+        {/* Side panel - Google Maps style */}
+        <div className="w-full md:w-80 shrink-0 rounded-2xl overflow-auto p-4 space-y-3 shadow-2xl" style={{ background: 'var(--card-bg)', border: '2px solid rgba(255, 255, 255, 0.4)' }}>
           {selectedRoom ? (
             <RoomPanel room={selectedRoom} onClose={() => setSelectedRoom(null)} />
           ) : selectedBuilding ? (
@@ -286,24 +514,40 @@ export default function MapView() {
 }
 
 function ModeBar({ mode, setMode, resetView }: { mode: Mode; setMode: (m: Mode) => void; resetView: () => void }) {
-  const modes: { id: Mode; label: string }[] = [
-    { id: 'satellite', label: 'Satellite / Bird-eye' },
-    { id: '3d', label: '3D Orbit' },
-    { id: 'indoor', label: 'Indoor Floor Plan' },
-    { id: 'firstperson', label: 'First-Person' },
+  const modes: { id: Mode; label: string; icon: any }[] = [
+    { id: 'satellite', label: 'Map View', icon: MapPin },
+    { id: '3d', label: '3D Buildings', icon: Building2 },
+    { id: 'indoor', label: 'Indoor', icon: DoorOpen },
+    { id: 'firstperson', label: 'Street View', icon: Eye },
   ];
   return (
     <div className="flex items-center gap-2 flex-wrap">
-      {modes.map(m => (
-        <button
-          key={m.id}
-          onClick={() => setMode(m.id)}
-          className={`px-3 py-1.5 text-xs rounded-lg border ${mode === m.id ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}
-        >
-          {m.label}
-        </button>
-      ))}
-      <button onClick={resetView} className="ml-auto px-3 py-1.5 text-xs rounded-lg border bg-white text-slate-600 border-slate-200 hover:bg-slate-50">Reset to campus</button>
+      {modes.map(m => {
+        const Icon = m.icon;
+        return (
+          <button
+            key={m.id}
+            onClick={() => setMode(m.id)}
+            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-bold rounded-xl shadow-lg transition-all ${
+              mode === m.id
+                ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white'
+                : 'text-slate-700 hover:scale-105'
+            }`}
+            style={mode !== m.id ? { background: 'var(--card-bg)' } : {}}
+          >
+            <Icon size={16} />
+            {m.label}
+          </button>
+        );
+      })}
+      <button
+        onClick={resetView}
+        className="ml-auto flex items-center gap-2 px-4 py-2.5 text-sm font-bold rounded-xl shadow-lg text-slate-700 hover:scale-105 transition-all"
+        style={{ background: 'var(--card-bg)' }}
+      >
+        <Navigation size={16} />
+        Reset View
+      </button>
     </div>
   );
 }
