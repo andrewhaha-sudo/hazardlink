@@ -1,7 +1,7 @@
 {
   "buildCommand": "npm run build:client",
   "installCommand": "",
-  "outputDirectory": "client/out",
+  "outputDirectory": ".next",
   "framework": null,
   "functions": {
     "api/**/*.js": {
