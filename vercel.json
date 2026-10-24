@@ -1,8 +1,7 @@
 {
   "buildCommand": "npm run build:client",
   "installCommand": "",
-  "outputDirectory": "client/.next",
-  "framework": null,
+  "outputDirectory": ".next",
   "functions": {
     "api/**/*.js": {
       "maxDuration": 30
