@@ -1,7 +1,7 @@
 {
-  "buildCommand": "npm --prefix client install && npm --prefix client run build",
+  "buildCommand": "npm install && npm run build",
   "outputDirectory": "client/.next",
-  "installCommand": "npm install",
+  "installCommand": "",
   "framework": null,
   "functions": {
     "api/**/*.js": {
