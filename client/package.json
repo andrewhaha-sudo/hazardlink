@@ -4,9 +4,9 @@
   "private": true,
   "description": "HAZARDLINK — Smart School Hazard Mapping and Disaster Response System (Frontend)",
   "scripts": {
-    "dev": "next dev -p 5000",
-        "build": "next build",
-        "start": "next start"
+    "dev": "node dev.js",
+    "build": "next build",
+    "start": "next start"
   },
   "dependencies": {
     "@types/three": "^0.186.0",
