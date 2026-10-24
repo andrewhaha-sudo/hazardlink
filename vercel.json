@@ -1,7 +1,8 @@
 {
-  "buildCommand": "npm run build:client",
+  "buildCommand": "npm run build:client && cp -r client/.next .next",
   "installCommand": "",
   "outputDirectory": ".next",
+  "framework": null,
   "functions": {
     "api/**/*.js": {
       "maxDuration": 30
