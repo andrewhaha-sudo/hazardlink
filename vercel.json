@@ -1,6 +1,6 @@
 {
   "buildCommand": "npm install && npm run build",
-  "outputDirectory": "client/.next",
+  "outputDirectory": ".next",
   "installCommand": "",
   "framework": null,
   "functions": {
