@@ -60,12 +60,15 @@ export default function ReportPage() {
   };
 
   return (
-    <div className="max-w-xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-          <AlertTriangle className="text-orange-600" /> Report a Hazard
+    <div className="max-w-2xl mx-auto space-y-6">
+      <div className="glass-panel">
+        <h1 className="text-3xl font-black text-slate-900 flex items-center gap-3 mb-2">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white shadow-lg">
+            <AlertTriangle size={24} />
+          </div>
+          Report a Hazard
         </h1>
-        <p className="text-slate-600">Report dangerous conditions to help keep the school community safe.</p>
+        <p className="text-slate-600 font-medium">Report dangerous conditions to help keep the school community safe.</p>
       </div>
         {submitted ? (
         <div className="card p-8 text-center border-green-200 bg-green-50">
@@ -79,16 +82,16 @@ export default function ReportPage() {
         <form onSubmit={handleSubmit} className="card space-y-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Type of Hazard</label>
-              <select value={type} onChange={(e) => setType(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 outline-none bg-white">
+              <label className="block text-sm font-bold text-slate-900 mb-2">Type of Hazard</label>
+              <select value={type} onChange={(e) => setType(e.target.value)} className="w-full px-4 py-3 border-2 border-white/50 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all font-medium" style={{ background: 'rgba(255, 255, 255, 0.7)' }}>
                 {types.map((t) => (
                   <option key={t.value} value={t.value}>{t.label}</option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Severity</label>
-              <select value={severity} onChange={(e) => setSeverity(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 outline-none bg-white">
+              <label className="block text-sm font-bold text-slate-900 mb-2">Severity</label>
+              <select value={severity} onChange={(e) => setSeverity(e.target.value)} className="w-full px-4 py-3 border-2 border-white/50 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all font-medium" style={{ background: 'rgba(255, 255, 255, 0.7)' }}>
                 {severities.map((s) => (
                   <option key={s.value} value={s.value}>{s.label}</option>
                 ))}
@@ -96,10 +99,11 @@ export default function ReportPage() {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+            <label className="block text-sm font-bold text-slate-900 mb-2">Description</label>
             <textarea
               value={description} onChange={(e) => setDescription(e.target.value)}
-              rows={3} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 outline-none bg-white"
+              rows={4} className="w-full px-4 py-3 border-2 border-white/50 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all font-medium resize-none"
+              style={{ background: 'rgba(255, 255, 255, 0.7)' }}
               placeholder="Describe what you observed (e.g., knee-deep floodwater near Gate 1)..."
             />
           </div>
@@ -128,9 +132,11 @@ export default function ReportPage() {
               </div>
             </div>
           </div>
-          <div className="pt-4 border-t border-slate-200">
-            <p className="text-xs text-slate-500 mb-3">Report statuses: Pending Verification → Verified / Resolved / Rejected. Unverified reports are shown distinctly.</p>
-            <button type="submit" disabled={submitting} className="w-full bg-amber-600 hover:bg-amber-700 disabled:opacity-60 text-white text-sm font-semibold px-4 py-3 rounded-xl transition-colors">
+          <div className="pt-6 border-t border-white/30">
+            <p className="text-xs text-slate-600 mb-4 font-medium p-3 rounded-xl" style={{ background: 'rgba(255, 255, 255, 0.5)' }}>
+              Report statuses: Pending Verification → Verified / Resolved / Rejected. Unverified reports are shown distinctly.
+            </p>
+            <button type="submit" disabled={submitting} className="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 disabled:opacity-60 text-white text-base font-black px-6 py-4 rounded-2xl transition-all shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95">
               {submitting ? 'Submitting...' : 'Submit Report'}
             </button>
           </div>

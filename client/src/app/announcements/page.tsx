@@ -18,11 +18,14 @@ export default function AnnouncementsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-          <Bell className="text-indigo-600" /> School Announcements
+      <div className="glass-panel">
+        <h1 className="text-3xl font-black text-slate-900 flex items-center gap-3 mb-2">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-lg">
+            <Bell size={24} />
+          </div>
+          School Announcements
         </h1>
-        <p className="text-slate-600">Class suspensions, closures, warnings, and evacuation instructions from authorized administrators.</p>
+        <p className="text-slate-600 font-medium">Class suspensions, closures, warnings, and evacuation instructions from authorized administrators.</p>
       </div>
         {loading ? (
         <div className="card p-12 text-center text-slate-500">Loading announcements...</div>

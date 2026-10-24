@@ -23,11 +23,14 @@ export default function AlertsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-          <AlertTriangle className="text-orange-600" /> Disaster Alerts
+      <div className="glass-panel">
+        <h1 className="text-3xl font-black text-slate-900 flex items-center gap-3 mb-2">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white shadow-lg">
+            <AlertTriangle size={24} />
+          </div>
+          Disaster Alerts
         </h1>
-        <p className="text-slate-600">Official and community-reported hazard advisories.</p>
+        <p className="text-slate-600 font-medium">Official and community-reported hazard advisories.</p>
       </div>
         {loading ? (
         <div className="card p-12 text-center text-slate-500">Loading alerts...</div>

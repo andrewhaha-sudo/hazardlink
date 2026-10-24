@@ -17,11 +17,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
         </main>
         <LiveToasts />
-        <footer className="border-t border-slate-200 bg-white py-4 text-center text-xs text-slate-500">
-          HAZARDLINK — system. All hazard & alert data is OFFICIAL for demonstration.
-          Use official sources: <a href="https://phivolcs.dost.gov.ph" className="text-slate-700 underline">PHIVOLCS</a> •
-          <a href="https://pagasa.dost.gov.ph" className="text-slate-700 underline">PAGASA</a> •
-          <a href="https://ndrrmc.gov.ph" className="text-slate-700 underline">NDRRMC</a>.
+        <footer className="border-t border-white/30 backdrop-blur-xl py-6 text-center text-xs text-slate-600" style={{ background: 'rgba(255, 252, 250, 0.85)' }}>
+          <div className="font-semibold mb-2">HAZARDLINK — Demonstration System</div>
+          <p className="text-slate-500">All hazard & alert data is simulated for demonstration purposes.</p>
+          <div className="mt-3 flex justify-center gap-3 flex-wrap">
+            <a href="https://phivolcs.dost.gov.ph" className="text-purple-600 hover:text-purple-700 font-semibold underline transition-colors">PHIVOLCS</a>
+            <span className="text-slate-300">•</span>
+            <a href="https://pagasa.dost.gov.ph" className="text-purple-600 hover:text-purple-700 font-semibold underline transition-colors">PAGASA</a>
+            <span className="text-300">•</span>
+            <a href="https://ndrrmc.gov.ph" className="text-purple-600 hover:text-purple-700 font-semibold underline transition-colors">NDRRMC</a>
+          </div>
         </footer>
       </body>
     </html>
